@@ -1,0 +1,21 @@
+{
+  "socialLinks": {
+    "twitter": "https://x.com/Serina765P",
+    "youtube": "https://www.youtube.com/@Serina765P",
+    "bilibili": "https://space.bilibili.com/1726354044",
+    "github": "https://github.com/Serina765P",
+    "qq": "2241439211",
+    "steam": "https://steamcommunity.com/id/serinap/",
+    "blog": "https://blog.serinap.top"
+  },
+  "gameIds": {
+    "mltd": {
+      "id": "6D9Y76PU",
+      "icon": "images/mltd.webp"
+    },
+    "scsp": {
+      "id": "3Z3CYP9S2",
+      "icon": "images/scsp.webp"
+    }
+  }
+}

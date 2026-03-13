@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>芹菜P | SerinaP | セリナＰ</title>
+    <meta name="description" content="制作人芹菜P的个人社交聚合页">
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Sans+JP:wght@300;400;500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        haruka: '#e22b30',
+                        chihaya: '#2743d2',
+                        nao: '#788bc5',
+                        rinwa: '#916691',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans SC', 'Noto Sans JP', 'sans-serif'],
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'gradient': 'gradient 8s linear infinite',
+                        'slide-up': 'slideUp 0.6s ease-out forwards',
+                        'fade-in': 'fadeIn 0.8s ease-out forwards',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        gradient: {
+                            '0%, 100%': { backgroundPosition: '0% 50%' },
+                            '50%': { backgroundPosition: '100% 50%' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(30px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        .gradient-text {
+            background: linear-gradient(135deg, #e22b30 0%, #2743d2 25%, #788bc5 50%, #916691 75%, #e22b30 100%);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradient 8s ease infinite;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .dark .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .idol-card {
+            transition: all 0.3s ease;
+        }
+        
+        .idol-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .social-btn {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .social-btn:hover {
+            transform: scale(1.1) rotate(3deg);
+        }
+        
+        .copy-toast {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+        }
+        
+        .copy-toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .lang-btn.active {
+            background: linear-gradient(135deg, #e22b30, #2743d2);
+            color: white;
+        }
+        
+        /* 隐藏滚动条但保持功能 */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-slate-900 text-gray-800 dark:text-gray-200 transition-colors duration-300 min-h-screen overflow-x-hidden">
+    
+    <!-- 背景装饰 -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div class="absolute top-0 left-1/4 w-96 h-96 bg-haruka/20 rounded-full blur-3xl animate-pulse-slow"></div>
+        <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-chihaya/20 rounded-full blur-3xl animate-pulse-slow" style="animation-delay: 2s;"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-nao/10 rounded-full blur-3xl animate-pulse-slow" style="animation-delay: 4s;"></div>
+    </div>
+
+    <!-- 导航栏 -->
+    <nav class="fixed top-0 w-full z-50 glass-card border-b border-gray-200 dark:border-gray-800 transition-all duration-300">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 rounded-full overflow-hidden border border-gray-300 dark:border-gray-600 flex-shrink-0">
+                        <img id="nav-avatar" src="images/fav.webp" alt="头像" class="w-full h-full object-cover">
+                    </div>
+                    <span class="font-bold text-lg tracking-tight" data-i18n="name">芹菜P</span>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <!-- 语言切换 -->
+                    <div class="flex bg-gray-200 dark:bg-slate-800 rounded-full p-1 space-x-1">
+                        <button onclick="setLanguage('zh')" class="lang-btn px-3 py-1 rounded-full text-xs font-medium transition-all" data-lang="zh">中</button>
+                        <button onclick="setLanguage('ja')" class="lang-btn px-3 py-1 rounded-full text-xs font-medium transition-all" data-lang="ja">日</button>
+                        <button onclick="setLanguage('en')" class="lang-btn px-3 py-1 rounded-full text-xs font-medium transition-all" data-lang="en">EN</button>
+                    </div>
+                    
+                    <!-- 主题切换 -->
+                    <button onclick="toggleTheme()" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-slate-800 transition-colors">
+                        <i class="fas fa-sun text-yellow-500 dark:hidden"></i>
+                        <i class="fas fa-moon text-blue-400 hidden dark:block"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main class="relative z-10 pt-20 pb-8 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto min-h-screen flex flex-col justify-center">
+        
+        <!-- 头部区域 -->
+        <section class="text-center mb-8 animate-fade-in">
+            <div class="relative inline-block mb-6">
+                <div class="w-32 h-32 sm:w-40 sm:h-40 rounded-full p-1 bg-gradient-to-br from-haruka via-chihaya via-nao to-rinwa animate-gradient bg-[length:300%_300%]">
+                    <div class="w-full h-full rounded-full bg-white dark:bg-slate-800 flex items-center justify-center overflow-hidden">
+                        <img id="avatar-image" src="" alt="头像" class="w-full h-full object-cover">
+                    </div>
+                </div>
+                <div class="absolute -bottom-2 -right-2 w-8 h-8 bg-rinwa rounded-full flex items-center justify-center text-white text-xs animate-bounce">
+                    <i class="fas fa-star"></i>
+                </div>
+            </div>
+
+            <h1 class="text-4xl sm:text-5xl font-bold mb-2 tracking-tight">
+                <span class="gradient-text" id="name-display">芹菜P</span>
+            </h1>
+            <p class="text-lg text-gray-600 dark:text-gray-400 mb-1 font-medium" id="subtitle-display">Serina765P</p>
+            <p class="text-sm text-gray-500 dark:text-gray-500 max-w-md mx-auto" id="intro-display" data-i18n="intro">
+                新人制作人，请多指教！
+            </p>
+        </section>
+
+        <!-- 担当偶像展示 -->
+        <section class="mb-8 animate-slide-up" style="animation-delay: 0.2s;">
+            <h2 class="text-center text-sm font-bold text-gray-400 dark:text-gray-600 uppercase tracking-widest mb-4" data-i18n="idols">担当偶像</h2>
+            <div id="idols-container" class="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-3xl mx-auto">
+                <!-- 动态加载 -->
+            </div>
+        </section>
+
+        <!-- 我的项目 -->
+        <section class="mb-8 animate-slide-up" style="animation-delay: 0.4s;">
+            <h2 class="text-center text-sm font-bold text-gray-400 dark:text-gray-600 uppercase tracking-widest mb-6" data-i18n="my_projects">我的项目</h2>
+
+            <!-- 偶像大师中文维基广告 -->
+            <div id="wiki-card" class="mb-6">
+                <a href="https://wikimas.org/" target="_blank" rel="noopener noreferrer" class="block">
+                    <div class="glass-card rounded-2xl p-4 max-w-3xl mx-auto border border-blue-300/30 dark:border-blue-700/30 hover:border-blue-400/60 dark:hover:border-blue-600/60 transition-all hover:shadow-lg group">
+                        <div class="flex items-center justify-between">
+                            <div class="flex-1">
+                                <h3 id="wiki-title" class="font-bold text-base text-blue-600 dark:text-blue-400 mb-1 group-hover:text-blue-700 dark:group-hover:text-blue-300 transition-colors">
+                                    📖 偶像大师中文维基
+                                </h3>
+                                <p id="wiki-desc" class="text-sm text-gray-600 dark:text-gray-400">
+                                    (可能是临时) 站长，仍在筹备阶段，敬请期待！
+                                </p>
+                            </div>
+                            <div class="ml-4 text-2xl text-blue-400 group-hover:translate-x-1 transition-transform flex-shrink-0">
+                                →
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- 游戏ID区域 -->
+            <div class="glass-card rounded-2xl p-6 max-w-2xl mx-auto border border-gray-200 dark:border-gray-700">
+                <h3 class="text-center text-sm font-bold text-gray-400 dark:text-gray-600 uppercase tracking-widest mb-4" data-i18n="game_ids">游戏ID</h3>
+                <div id="game-ids-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <!-- 动态加载 -->
+                </div>
+            </div>
+        </section>
+
+        <!-- 社交媒体 -->
+        <section class="mb-8 animate-slide-up" style="animation-delay: 0.6s;">
+            <h2 class="text-center text-sm font-bold text-gray-400 dark:text-gray-600 uppercase tracking-widest mb-4" data-i18n="social">社交媒体</h2>
+            <div class="flex flex-wrap justify-center gap-4 max-w-3xl mx-auto">
+                <a href="#" class="social-btn glass-card w-14 h-14 rounded-2xl flex items-center justify-center text-2xl text-gray-700 dark:text-gray-300 hover:text-blue-400 hover:border-blue-400 border border-transparent">
+                    <i class="fab fa-twitter"></i>
+                </a>
+                <a href="#" class="social-btn glass-card w-14 h-14 rounded-2xl flex items-center justify-center text-2xl text-gray-700 dark:text-gray-300 hover:text-red-600 hover:border-red-600 border border-transparent">
+                    <i class="fab fa-youtube"></i>
+                </a>
+                <a href="#" class="social-btn glass-card w-14 h-14 rounded-2xl flex items-center justify-center text-2xl text-gray-700 dark:text-gray-300 hover:text-pink-400 hover:border-pink-400 border border-transparent">
+                    <i class="fab fa-bilibili"></i>
+                </a>
+                <a href="#" class="social-btn glass-card w-14 h-14 rounded-2xl flex items-center justify-center text-2xl text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:border-gray-900 dark:hover:border-white border border-transparent">
+                    <i class="fab fa-github"></i>
+                </a>
+                <a href="#" class="social-btn glass-card w-14 h-14 rounded-2xl flex items-center justify-center text-2xl text-gray-700 dark:text-gray-300 hover:text-blue-500 hover:border-blue-500 border border-transparent">
+                    <i class="fab fa-qq"></i>
+                </a>
+                <a href="#" class="social-btn glass-card w-14 h-14 rounded-2xl flex items-center justify-center text-2xl text-gray-700 dark:text-gray-300 hover:text-gray-600 hover:border-gray-600 border border-transparent">
+                    <i class="fab fa-steam"></i>
+                </a>
+                <a href="https://blog.serinap.top" target="_blank" class="social-btn glass-card w-14 h-14 rounded-2xl flex items-center justify-center text-2xl text-gray-700 dark:text-gray-300 hover:text-chihaya hover:border-chihaya border border-transparent group relative">
+                    <i class="fas fa-blog"></i>
+                    <span class="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity bg-gray-800 text-white px-2 py-1 rounded" data-i18n="blog">博客</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- 页脚 -->
+        <footer class="text-center text-xs text-gray-400 dark:text-gray-600 mt-auto animate-fade-in" style="animation-delay: 0.8s;">
+            <p id="footer-text" class="mb-3 text-[11px] sm:text-xs">© 2026 芹菜P</p>
+            <div id="footer-badges" class="flex flex-wrap justify-center gap-2 text-[11px] sm:text-xs px-4">
+                <!-- 动态加载 -->
+            </div>
+        </footer>
+    </main>
+
+    <!-- 复制成功提示 -->
+    <div id="toast" class="copy-toast fixed bottom-8 left-1/2 transform -translate-x-1/2 glass-card px-6 py-3 rounded-full shadow-lg z-50 flex items-center space-x-2 border border-green-500/30">
+        <i class="fas fa-check-circle text-green-500"></i>
+        <span id="toast-message" class="text-sm font-medium">已复制到剪贴板</span>
+    </div>
+
+    <script>
+        // 全局变量
+        let currentLang = 'zh';
+        let profileData = null;
+        let i18nData = null;
+        let dataConfig = null;
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            // 检测系统主题
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.documentElement.classList.add('dark');
+            }
+
+            // 监听系统主题变化
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+                if (event.matches) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            });
+
+            // 加载数据
+            loadData();
+        });
+
+        // 加载 JSON 数据
+        async function loadData() {
+            try {
+                // 加载个人信息
+                const profileRes = await fetch('data/profile.json');
+                profileData = await profileRes.json();
+
+                // 加载多语言
+                const i18nRes = await fetch('data/i18n.json');
+                i18nData = await i18nRes.json();
+
+                // 加载数据配置（社交链接和游戏ID）
+                const dataRes = await fetch('data/data.json');
+                dataConfig = await dataRes.json();
+
+                // 初始化页面
+                initializePage();
+            } catch (error) {
+                console.error('数据加载失败:', error);
+            }
+        }
+
+        // 初始化页面内容
+        function initializePage() {
+            // 设置头像
+            const avatarImg = document.getElementById('avatar-image');
+            if (avatarImg) {
+                avatarImg.src = profileData.avatar;
+                avatarImg.alt = profileData.name;
+            }
+
+            // 设置导航栏名字
+            const navName = document.querySelector('nav .font-bold.text-lg');
+            if (navName) {
+                navName.textContent = profileData.name;
+            }
+
+            // 加载偶像卡片
+            loadIdolCards();
+
+            // 加载游戏ID
+            loadGameIds();
+
+            // 加载页脚
+            loadFooter();
+
+            // 设置社交链接
+            setSocialLinks();
+
+            // 初始化语言按钮
+            updateLangButtons();
+
+            // 初始化语言显示
+            setLanguage('zh');
+        }
+
+        // 加载偶像卡片
+        function loadIdolCards() {
+            const container = document.getElementById('idols-container');
+            container.innerHTML = '';
+
+            const colorMap = {
+                'haruka': '#e22b30',
+                'chihaya': '#2743d2',
+                'nao': '#788bc5',
+                'rinwa': '#916691'
+            };
+
+            profileData.idols.forEach(idol => {
+                const card = document.createElement('div');
+                const borderColor = colorMap[idol.color];
+                card.className = 'idol-card glass-card rounded-2xl p-4 text-center border-t-4 transition-all hover:shadow-lg';
+                card.style.borderTopColor = borderColor;
+
+                card.innerHTML = `
+                    <div class="w-16 h-16 mx-auto mb-3 rounded-lg overflow-hidden flex-shrink-0" style="border: 2px solid ${borderColor}33;">
+                        <img src="${idol.image}" alt="${idol.nameZh}" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="font-bold text-sm">${idol.nameZh}</h3>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">${idol.series}</p>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // 加载游戏ID
+        function loadGameIds() {
+            const container = document.getElementById('game-ids-container');
+            container.innerHTML = '';
+
+            const colorMap = {
+                'mltd': { bg: 'rgba(255, 195, 11, 0.2)', bgHover: 'rgba(255, 195, 11, 0.3)', text: '#ffc30b', icon: 'rgba(255, 195, 11, 0.3)' },
+                'scsp': { bg: 'rgba(141, 187, 255, 0.2)', bgHover: 'rgba(141, 187, 255, 0.3)', text: '#8dbbff', icon: 'rgba(141, 187, 255, 0.3)' }
+            };
+
+            Object.entries(dataConfig.gameIds).forEach(([key, game]) => {
+                const style = colorMap[key] || colorMap['mltd'];
+                const gameName = i18nData[currentLang][`game_${key}_name`];
+
+                const button = document.createElement('button');
+                button.className = 'group relative overflow-hidden rounded-xl p-4 transition-all text-left';
+                button.style.background = `linear-gradient(to right, ${style.bg}, rgba(220,220,220,0.2))`;
+                button.style.border = `1px solid ${style.text}40`;
+
+                button.onmouseenter = function() {
+                    this.style.background = `linear-gradient(to right, ${style.bgHover}, rgba(220,220,220,0.3))`;
+                };
+                button.onmouseleave = function() {
+                    this.style.background = `linear-gradient(to right, ${style.bg}, rgba(220,220,220,0.2))`;
+                };
+
+                button.onclick = () => copyToClipboard(game.id);
+
+                button.innerHTML = `
+                    <div class="flex items-start justify-between gap-2">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="text-xs font-bold" style="color: ${style.text};">${gameName}</span>
+                                <i class="fas fa-copy opacity-0 group-hover:opacity-100 transition-opacity" style="color: ${style.text};"></i>
+                            </div>
+                            <p class="text-lg font-mono font-bold text-gray-800 dark:text-gray-200 mb-1">${game.id}</p>
+                            <p class="text-xs text-gray-500" data-i18n="click_copy">点击复制</p>
+                        </div>
+                        <div class="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0" style="border: 2px solid ${style.icon};">
+                            <img src="${game.icon}" alt="${gameName}" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                `;
+                container.appendChild(button);
+            });
+        }
+
+        // 加载页脚
+        function loadFooter() {
+            const footerText = document.getElementById('footer-text');
+            if (footerText) {
+                footerText.innerHTML = i18nData[currentLang].footer_text + ' | Generate using AI support';
+            }
+
+            const badgesContainer = document.getElementById('footer-badges');
+            badgesContainer.innerHTML = profileData.footerBadges.map(badge => {
+                return `<span style="color: ${badge.color}; font-weight: 600; white-space: nowrap;">${badge.name}</span>`;
+            }).join('<span class="mx-1 text-gray-300 dark:text-gray-700">·</span>');
+        }
+
+        // 设置社交链接
+        function setSocialLinks() {
+            const socialBtns = document.querySelectorAll('.social-btn');
+            const links = [
+                { href: dataConfig.socialLinks.twitter, class: 'fab fa-twitter' },
+                { href: dataConfig.socialLinks.youtube, class: 'fab fa-youtube' },
+                { href: dataConfig.socialLinks.bilibili, class: 'fab fa-bilibili' },
+                { href: dataConfig.socialLinks.github, class: 'fab fa-github' },
+                { href: dataConfig.socialLinks.qq, class: 'fab fa-qq' },
+                { href: dataConfig.socialLinks.steam, class: 'fab fa-steam' },
+                { href: dataConfig.socialLinks.blog, class: 'fas fa-blog' }
+            ];
+
+            socialBtns.forEach((btn, index) => {
+                if (links[index]) {
+                    btn.href = links[index].href;
+                }
+            });
+        }
+
+        // 语言切换
+        function setLanguage(lang) {
+            currentLang = lang;
+            document.documentElement.lang = lang === 'zh' ? 'zh-CN' : lang === 'ja' ? 'ja' : 'en';
+
+            // 更新页面标题和副标题
+            const nameDisplay = document.getElementById('name-display');
+            if (nameDisplay) {
+                nameDisplay.textContent = i18nData[lang].name;
+            }
+
+            // 更新导航栏
+            const navName = document.querySelector('nav .font-bold.text-lg');
+            if (navName) {
+                navName.textContent = i18nData[lang].name;
+            }
+
+            // 更新偶像名字
+            const idolCards = document.querySelectorAll('.idol-card h3');
+            idolCards.forEach((card, index) => {
+                const idol = profileData.idols[index];
+                if (idol) {
+                    card.textContent = lang === 'zh' ? idol.nameZh :
+                                      lang === 'ja' ? idol.nameJa :
+                                      idol.nameEn;
+                }
+            });
+
+            // 更新所有带 data-i18n 属性的元素
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (i18nData && i18nData[lang] && i18nData[lang][key]) {
+                    element.textContent = i18nData[lang][key];
+                }
+            });
+
+            // 更新维基卡片文本
+            const wikiTitle = document.getElementById('wiki-title');
+            const wikiDesc = document.getElementById('wiki-desc');
+            if (wikiTitle && i18nData && i18nData[lang]) {
+                wikiTitle.textContent = i18nData[lang].wiki_title;
+                wikiDesc.textContent = i18nData[lang].wiki_desc;
+            }
+
+            // 重新加载游戏ID以更新名字
+            loadGameIds();
+
+            // 更新页脚
+            loadFooter();
+
+            updateLangButtons();
+        }
+
+        function updateLangButtons() {
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                if (btn.getAttribute('data-lang') === currentLang) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+
+        // 主题切换
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+        }
+
+        // 复制到剪贴板
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast(i18nData[currentLang].copied);
+            }).catch(err => {
+                // 降级方案
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showToast(i18nData[currentLang].copied);
+            });
+        }
+
+        // 显示提示
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            toastMessage.textContent = message;
+            toast.classList.add('show');
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // 添加页面加载动画
+        window.addEventListener('load', () => {
+            document.querySelectorAll('.animate-slide-up').forEach((el, index) => {
+                el.style.opacity = '0';
+                setTimeout(() => {
+                    el.style.opacity = '1';
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>

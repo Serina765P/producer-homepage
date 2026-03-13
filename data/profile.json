@@ -1,0 +1,81 @@
+{
+  "name": "芹菜P",
+  "nameEn": "SerinaP",
+  "nameJa": "セリナＰ",
+  "avatar": "images/fav.webp",
+  "subtitle": "Serina765P",
+  "idols": [
+    {
+      "id": "haruka",
+      "nameZh": "天海春香",
+      "nameEn": "Haruka Amami",
+      "nameJa": "天海春香",
+      "series": "765PRO ALLSTARS",
+      "color": "haruka",
+      "image": "images/haruka.webp",
+      "icon": "fas fa-heart"
+    },
+    {
+      "id": "chihaya",
+      "nameZh": "如月千早",
+      "nameEn": "Chihaya Kisaragi",
+      "nameJa": "如月千早",
+      "series": "765PRO ALLSTARS",
+      "color": "chihaya",
+      "image": "images/chihaya.webp",
+      "icon": "fas fa-music"
+    },
+    {
+      "id": "nao",
+      "nameZh": "横山奈绪",
+      "nameEn": "Nao Yokoyama",
+      "nameJa": "横山奈緒",
+      "series": "MILLION LIVE!",
+      "color": "nao",
+      "image": "images/nao.webp",
+      "icon": "fas fa-home"
+    },
+    {
+      "id": "rinwa",
+      "nameZh": "贺阳燐羽",
+      "nameEn": "Rinha Kaya",
+      "nameJa": "賀陽燐羽",
+      "series": "Gakuen IDOLM@STER",
+      "color": "rinwa",
+      "image": "images/rinha.webp",
+      "icon": "fas fa-feather"
+    }
+  ],
+  "footerBadges": [
+    {
+      "name": "765AS",
+      "color": "#f34f6d"
+    },
+    {
+      "name": "Cinderella",
+      "color": "#2681c8"
+    },
+    {
+      "name": "Million",
+      "color": "#ffc30b"
+    },
+    {
+      "name": "SideM",
+      "color": "#0fbe94"
+    },
+    {
+      "name": "Shiny",
+      "color": "#8dbbff"
+    },
+    {
+      "name": "Gakuen",
+      "color": "#f39800"
+    },
+    {
+      "name": "vα-liv",
+      "color": "#656a75"
+    }
+  ]
+}
+
+
