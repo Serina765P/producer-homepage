@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>南南？</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+            background: #fafafa;
+        }
+        textarea {
+            width: 100%;
+            height: 120px;
+            margin: 10px 0;
+            font-family: monospace;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px 5px 5px 0;
+            cursor: pointer;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        button:hover {
+            background: #f0f0f0;
+            border-color: #999;
+        }
+        button.primary {
+            background: #2c3e50;
+            color: white;
+            border-color: #2c3e50;
+        }
+        button.primary:hover {
+            background: #34495e;
+        }
+        .options {
+            margin: 15px 0;
+            padding: 12px;
+            background: #f0f4f8;
+            border-radius: 4px;
+            border-left: 4px solid #3498db;
+        }
+        .info {
+            color: #666;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+        .stats {
+            color: #27ae60;
+            font-size: 0.9em;
+            margin-top: 5px;
+            font-weight: bold;
+        }
+        .error {
+            color: #e74c3c;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        h1 { color: #2c3e50; border-bottom: 2px solid #ecf0f1; padding-bottom: 10px; }
+        .hint { background: #fff3cd; padding: 10px; border-radius: 4px; margin: 10px 0; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <h1>南南？</h1>
+    <p>南南？</p>
+    
+    <textarea id="input" placeholder="在此输入要加密的文本（支持中文/日文/Emoji）...">白石紬</textarea>
+    
+    <div class="options">
+        <label style="cursor: pointer; display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" id="useGzip" style="cursor: pointer;">
+            <span>启用 Gzip 压缩（推荐）</span>
+        </label>
+        <div class="info">
+            原理：对 UTF-8 字节流进行 Gzip 压缩，长文本可缩短 50%-70%，短的别用，会适得其反。<br>
+            加密后文本以 <code>[紬]</code> 开头，解密时自动识别。
+        </div>
+    </div>
+    
+    <div>
+        <button class="primary" onclick="doEncrypt()">🔒 加密</button>
+        <button class="primary" onclick="doDecrypt()">🔓 解密</button>
+        <button onclick="copyOutput()">📋 复制结果</button>
+        <button onclick="clearAll()">🗑️ 清空</button>
+    </div>
+    
+    <textarea id="output" placeholder="结果将显示在这里..." readonly></textarea>
+    <div id="stats" class="stats"></div>
+    
+    <div class="hint">
+        <strong>格式说明：</strong><br>
+        • 1 → 「南」 / 0 → 「..」<br>
+        • 每 8 位（1 字节）为一组，组间用空格分隔（因 UTF-8 为变长编码，需空格定位字符边界）<br>
+        • 示例：「H」(0x48) → <code>..南..南南南..</code> / 「紬」(0xE7B4AC) → <code>南南南..南南.. ..南南..南南.. ..南.南.南南..</code>
+    </div>
+
+    <script>
+        // Gzip 压缩
+        async function gzipCompress(uint8Array) {
+            const cs = new CompressionStream('gzip');
+            const writer = cs.writable.getWriter();
+            writer.write(uint8Array);
+            writer.close();
+            
+            const reader = cs.readable.getReader();
+            const chunks = [];
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                chunks.push(...value);
+            }
+            return new Uint8Array(chunks);
+        }
+
+        // Gzip 解压
+        async function gzipDecompress(uint8Array) {
+            const cs = new DecompressionStream('gzip');
+            const writer = cs.writable.getWriter();
+            writer.write(uint8Array);
+            writer.close();
+            
+            const reader = cs.readable.getReader();
+            const chunks = [];
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                chunks.push(...value);
+            }
+            return new Uint8Array(chunks);
+        }
+
+        // 字节数组转南南语
+        function bytesToNannan(bytes) {
+            return Array.from(bytes)
+                .map(byte => {
+                    const binary = byte.toString(2).padStart(8, '0');
+                    return binary.replace(/1/g, '南').replace(/0/g, '..');
+                })
+                .join(' ');
+        }
+
+        // 南南语转字节数组
+        function nannanToBytes(nannanText) {
+            const parts = nannanText.split(/\s+/).filter(p => p.length > 0);
+            
+            return new Uint8Array(parts.map((part, index) => {
+                // 验证：只能包含 "南" 和 ".."
+                if (!/^(南|\.\.)+$/.test(part)) {
+                    throw new Error(`第 ${index + 1} 组包含非法字符（只能有"南"和".."）`);
+                }
+                
+                const binary = part.replace(/南/g, '1').replace(/\.\./g, '0');
+                
+                if (binary.length !== 8) {
+                    throw new Error(`第 ${index + 1} 组长度错误（应为 8 位，实际 ${binary.length} 位）`);
+                }
+                
+                return parseInt(binary, 2);
+            }));
+        }
+
+        async function doEncrypt() {
+            const input = document.getElementById('input').value;
+            const useGzip = document.getElementById('useGzip').checked;
+            const output = document.getElementById('output');
+            const stats = document.getElementById('stats');
+            
+            try {
+                const encoder = new TextEncoder();
+                let bytes = encoder.encode(input);
+                let prefix = '';
+                
+                if (useGzip) {
+                    bytes = await gzipCompress(bytes);
+                    prefix = '[紬]'; // Gzip 标记
+                }
+                
+                const nannan = prefix + bytesToNannan(bytes);
+                output.value = nannan;
+                
+                // 统计
+                const compressionRatio = ((nannan.length / input.length) * 100).toFixed(1);
+                stats.innerHTML = `原始长度: ${input.length} 字符 | 南南: ${nannan.length} 字符 | 膨胀率: ${compressionRatio}%`;
+                if (useGzip) {
+                    const originalSize = encoder.encode(input).length;
+                    const compressedSize = bytes.length;
+                    const saving = ((1 - compressedSize/originalSize) * 100).toFixed(1);
+                    stats.innerHTML += `<br>（Gzip 压缩率: ${saving}% 空间节省）`;
+                }
+                
+            } catch (e) {
+                output.value = '';
+                stats.innerHTML = `<span class="error">加密错误: ${e.message}</span>`;
+            }
+        }
+
+        async function doDecrypt() {
+            const input = document.getElementById('input').value.trim();
+            const output = document.getElementById('output');
+            const stats = document.getElementById('stats');
+            
+            try {
+                let nannanText = input;
+                let useGzip = false;
+                
+                // 检测 Gzip 标记
+                if (nannanText.startsWith('[紬]')) {
+                    useGzip = true;
+                    nannanText = nannanText.substring(3);
+                }
+                
+                const bytes = nannanToBytes(nannanText);
+                let result;
+                
+                if (useGzip) {
+                    const decompressed = await gzipDecompress(bytes);
+                    result = new TextDecoder().decode(decompressed);
+                    stats.innerHTML = `已自动识别 Gzip 压缩格式并解压`;
+                } else {
+                    result = new TextDecoder().decode(bytes);
+                    stats.innerHTML = `标准 UTF-8 解码完成`;
+                }
+                
+                output.value = result;
+                
+            } catch (e) {
+                output.value = '';
+                stats.innerHTML = `<span class="error">解密失败: ${e.message}<br><br>提示：<br>1. 确保只包含"南"和".."两种符号<br>2. 确保每组严格为8位（如：南南..南..南）<br>3. 确保组间有空格分隔<br>4. 如果是压缩格式，确保开头有“[紬]”标记</span>`;
+            }
+        }
+
+        function copyOutput() {
+            const output = document.getElementById('output');
+            if (!output.value) return;
+            
+            output.select();
+            document.execCommand('copy');
+            
+            const btn = event.target;
+            const original = btn.textContent;
+            btn.textContent = '✓ 已复制';
+            setTimeout(() => btn.textContent = original, 2000);
+        }
+
+        function clearAll() {
+            document.getElementById('input').value = '';
+            document.getElementById('output').value = '';
+            document.getElementById('stats').innerHTML = '';
+        }
+    </script>
+</body>
+</html>
