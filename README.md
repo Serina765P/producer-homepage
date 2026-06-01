@@ -1,24 +1,7 @@
 # 芹菜P的主页
 
-> 一个关于偶像、游戏和热爱的个人主页。
 
-**[→ 访问主页](https://serina765p.github.io/producer-homepage/)**
-
----
-
-## 关于这里
-
-这是 **芹菜P（SerinaP / セリナＰ）** 的个人主页，一位 IDOLM@STER 系列的制作人。
-
-页面上展示了她担当的偶像们：
-
-| 偶像 | 系列 |
-|------|------|
-| 天海春香 | 765PRO ALLSTARS |
-| 如月千早 | 765PRO ALLSTARS |
-| 横山奈绪 | MILLION LIVE! |
-| 北上丽花 | MILLION LIVE! |
-| 贺阳燐羽 | Gakuen IDOLM@STER |
+**[→ 访问主页](https://www.serinap.top)**
 
 ---
 
