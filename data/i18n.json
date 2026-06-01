@@ -1,6 +1,6 @@
 {
   "zh": {
-    "name": "芹菜P",
+    "name": "芹菜Ｐ",
     "subtitle": "Serina765P",
     "intro": "新人制作人，请多指教！",
     "idols": "担当偶像",
@@ -13,7 +13,8 @@
     "game_scsp_name": "闪耀色彩 棱镜之歌",
     "footer_text": "© 2026 芹菜P",
     "my_projects": "我的项目",
-    "wiki_title": "📖 偶像大师中文维基",
+    "featured_label": "主推",
+    "wiki_title": "偶像大师中文维基",
     "wiki_desc": "(可能是临时) 站长，仍在筹备阶段，敬请期待！"
   },
   "ja": {
@@ -30,7 +31,8 @@
     "game_scsp_name": "シャイニーカラーズ Song for Prism",
     "footer_text": "© 2026 セリナＰ",
     "my_projects": "マイプロジェクト",
-    "wiki_title": "📖 アイドルマスター中文Wiki",
+    "featured_label": "推し",
+    "wiki_title": "アイドルマスター中文Wiki",
     "wiki_desc": "現在準備中です。ご期待ください！"
   },
   "en": {
@@ -47,7 +49,8 @@
     "game_scsp_name": "SHINY COLORS SONG FOR PRISM",
     "footer_text": "© 2026 SerinaP",
     "my_projects": "My Projects",
-    "wiki_title": "📖 IDOLM@STER Chinese Wiki",
+    "featured_label": "Featured",
+    "wiki_title": "IDOLM@STER Chinese Wiki",
     "wiki_desc": "Currently in preparation, stay tuned!"
   }
 }
