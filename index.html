@@ -29,6 +29,7 @@
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js" defer></script>
 
     <script>
         tailwind.config = {
@@ -143,6 +144,95 @@
         .toast { opacity: 0; transform: translate(-50%, 24px); transition: opacity .35s, transform .35s cubic-bezier(.2,.9,.2,1); }
         .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
+        /* ---- Loading overlay ---- */
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(245, 246, 251, 0.88);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            opacity: 1;
+            visibility: visible;
+            transition: opacity .45s ease, visibility .45s ease;
+        }
+        .dark .loading-overlay {
+            background: rgba(7, 10, 20, 0.84);
+        }
+        .loading-overlay.loaded {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        .loading-overlay__mask {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,.88));
+        }
+        .dark .loading-overlay__mask {
+            background: linear-gradient(180deg, rgba(7,10,20,.50), rgba(7,10,20,.84));
+        }
+        .loading-overlay__inner {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+        .loading-overlay__img {
+            width: 80px;
+            height: auto;
+        }
+        .loading-overlay__img img {
+            width: 100%;
+            height: auto;
+            display: block;
+            animation: jumping 1.5s linear infinite;
+            transform-origin: center bottom;
+        }
+        @keyframes jumping {
+            0% { transform: translateY(0px); }
+            20% { transform: translateY(0px); }
+            30% { transform: translateY(-30px); }
+            40% { transform: translateY(0px); }
+            50% { transform: translateY(-30px); }
+            60% { transform: translateY(0px); }
+            100% { transform: translateY(0px); }
+        }
+        .loading-overlay__text {
+            width: 240px;
+            height: 32px;
+            display: grid;
+            place-items: center;
+            color: #d4a008;
+        }
+        .dark .loading-overlay__text {
+            color: #ffc30b;
+        }
+        .loading-overlay__fallback-text {
+            font-family: 'Outfit', 'Inter', sans-serif;
+            font-size: 12px;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+        }
+        @media (min-width: 768px) {
+            .loading-overlay__img {
+                width: 112px;
+            }
+            .loading-overlay__text {
+                width: 320px;
+                height: 44px;
+            }
+            .loading-overlay__fallback-text {
+                font-size: 15px;
+                letter-spacing: 0.26em;
+            }
+        }
+
         /* ---- Scroll reveal ---- */
         .reveal { opacity: 0; transform: translateY(28px); transition: opacity .7s ease, transform .7s cubic-bezier(.2,.8,.2,1); }
         .reveal.in { opacity: 1; transform: none; }
@@ -150,10 +240,33 @@
         @media (prefers-reduced-motion: reduce) {
             .aurora span, .avatar-ring, .gradient-text { animation: none !important; }
             .reveal { opacity: 1 !important; transform: none !important; transition: none; }
+            .loading-overlay__img img { animation: none !important; }
         }
     </style>
 </head>
 <body class="font-sans text-slate-800 dark:text-slate-100 antialiased min-h-screen overflow-x-hidden transition-colors duration-500">
+
+    <!-- 加载遮罩 -->
+    <div id="loading-overlay" class="loading-overlay" aria-label="页面加载中" role="status">
+      <div class="loading-overlay__mask" aria-hidden="true"></div>
+      <div class="loading-overlay__inner">
+        <div class="loading-overlay__img">
+          <picture>
+            <source
+              srcset="https://millionlive-theaterdays.idolmaster-official.jp/assets/data/webp/common/load/17/sd.png.webp"
+              type="image/webp">
+            <img
+              src="https://millionlive-theaterdays.idolmaster-official.jp/assets/img/common/load/17/sd.png"
+              alt="loading"
+              onerror="this.parentElement.innerHTML='<div style=\'width:80px;height:100px;background:linear-gradient(135deg,#FFB6C1,#FF69B4);border-radius:40px 40px 20px 20px;display:flex;align-items:center;justify-content:center;font-size:24px;color:white;\'>♪</div>'"
+            >
+          </picture>
+        </div>
+        <div class="loading-overlay__text" id="loading-text">
+          <span class="loading-overlay__fallback-text">Now Loading...</span>
+        </div>
+      </div>
+    </div>
 
     <!-- 背景装饰：极光 + 颗粒 -->
     <div class="aurora" aria-hidden="true"><span class="a1"></span><span class="a2"></span><span class="a3"></span><span class="a4"></span></div>
@@ -290,6 +403,10 @@
     <script>
         let currentLang = 'zh';
         let profileData = null, i18nData = null, dataConfig = null;
+        let loadingOverlayTimer = null;
+        let loadingAnimation = null;
+        const loadingOverlayStartedAt = performance.now();
+        const loadingOverlayMinDuration = 1200;
 
         const idolColors = {
             haruka: '#e22b30', chihaya: '#2743d2', nao: '#788bc5', reika: '#5aa39d', rinwa: '#916691'
@@ -300,6 +417,8 @@
         };
 
         document.addEventListener('DOMContentLoaded', () => {
+            initLoadingAnimation();
+
             const savedTheme = localStorage.getItem('theme');
             if (savedTheme === 'dark') document.documentElement.classList.add('dark');
             else if (savedTheme === 'light') document.documentElement.classList.remove('dark');
@@ -325,6 +444,8 @@
                 initializePage();
             } catch (err) {
                 console.error('数据加载失败:', err);
+            } finally {
+                hideLoadingOverlay();
             }
         }
         function initializePage() {
@@ -339,6 +460,52 @@
             setSocialLinks();
             setLanguage(currentLang);
             initReveal();
+        }
+
+        function hideLoadingOverlay() {
+            const overlay = document.getElementById('loading-overlay');
+            if (!overlay) return;
+            if (loadingAnimation) {
+                loadingAnimation.destroy();
+                loadingAnimation = null;
+            }
+            clearTimeout(loadingOverlayTimer);
+            const elapsed = performance.now() - loadingOverlayStartedAt;
+            const delay = Math.max(0, loadingOverlayMinDuration - elapsed);
+            loadingOverlayTimer = setTimeout(() => overlay.classList.add('loaded'), delay);
+            setTimeout(() => {
+                if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
+            }, delay + 520);
+        }
+
+        function initLoadingAnimation() {
+            const container = document.getElementById('loading-text');
+            if (!container || typeof lottie === 'undefined') return;
+            const fallback = container.querySelector('.loading-overlay__fallback-text');
+            fetch('https://millionlive-theaterdays.idolmaster-official.jp/assets/data/lottie/loading.json')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(animationData => {
+                    loadingAnimation = lottie.loadAnimation({
+                        container,
+                        renderer: 'svg',
+                        loop: true,
+                        autoplay: true,
+                        animationData
+                    });
+                    if (fallback) {
+                        loadingAnimation.addEventListener('DOMLoaded', () => {
+                            fallback.style.display = 'none';
+                        });
+                    }
+                })
+                .catch(err => {
+                    console.warn('Lottie JSON 加载失败:', err);
+                });
         }
 
         function getIdolName(idol, lang) {
